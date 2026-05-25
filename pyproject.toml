@@ -30,7 +30,7 @@ dependencies = [
     "boto3",
     "requests",
     "beautifulsoup4",
-    "cht_utils",
+    "cht_utils@ git+https://github.com/deltares-research/cht_utils.git",
     "geojson",
     "netCDF4",
     "feedparser",
