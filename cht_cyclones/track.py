@@ -706,16 +706,20 @@ class TropicalCycloneTrack:
 
         # Then the points
         for ip in range(np.size(self.gdf.geometry.x)):
+
             point = Point((self.gdf.geometry.x[ip], self.gdf.geometry.y[ip]))
             tmptime = datetime.strptime(self.gdf.datetime[ip], "%Y%m%d %H%M%S")
             vmax = self.gdf.vmax[ip]
-            pc = 0.01 * self.gdf.pc[ip]
+            pc = self.gdf.pc[ip] 
+
+           
             # if vmax is NaN, set vmax to 1.0
             if np.isnan(vmax):
                 vmax = 1.0
 
-            # Determine category
+            # Determine category    
             if classification == "saffirsimpson":
+
                 vmax_unit = "knots"
 
                 categories = {
@@ -733,8 +737,9 @@ class TropicalCycloneTrack:
                         break
 
             elif classification == "pagasa":
-                vmax_unit = "km/h"
 
+                vmax_unit = "km/h"
+                
                 # Note: PAGASA uses km/h
                 categories_wsp = {
                     0.0: "TD",
@@ -744,6 +749,7 @@ class TropicalCycloneTrack:
                     118.0: "TY",
                     185.0: "STY",
                 }
+
                 categories_slp = {
                     1000.0: "TD",
                     999.0: "TS",
@@ -751,18 +757,24 @@ class TropicalCycloneTrack:
                     973.0: "TY",
                     927.0: "STY",
                 }
-                if not np.isnan(pc):
-                    # Default: use pressure
-                    for threshold, ct in categories_slp.items():
-                        if pc <= threshold:
-                            cat = ct
-                else:
+                
+                if vmax != 1.0:
                     # Use velocities
                     kts2kmh = 1.852
                     vmax = vmax * kts2kmh
                     for threshold, ct in categories_wsp.items():
                         if vmax > threshold:
                             cat = ct
+
+                else:
+                    # Default: use pressure
+                    for threshold, ct in categories_slp.items():
+                        if pc <= threshold:
+                            cat = ct
+
+                #print (pc, cat)    
+              
+              
 
             # If original vmax was NaN, set vmax also to NaN
             if np.isnan(self.gdf.vmax[ip]):
